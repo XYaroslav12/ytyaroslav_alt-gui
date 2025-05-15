@@ -1,0 +1,232 @@
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "ytyareoslav_gui_v1"
+gui.ResetOnSpawn = false
+
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 500, 0, 400)
+frame.Position = UDim2.new(0.5, -250, 0.5, -200)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "ytyareoslav gui v1"
+title.TextScaled = true
+title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.SourceSansBold
+
+-- Close & Open Buttons
+local closeBtn = Instance.new("TextButton", frame)
+closeBtn.Size = UDim2.new(0, 80, 0, 30)
+closeBtn.Position = UDim2.new(1, -85, 0, 5)
+closeBtn.Text = "CLOSE"
+closeBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+
+local openBtn = Instance.new("TextButton", gui)
+openBtn.Size = UDim2.new(0, 100, 0, 40)
+openBtn.Position = UDim2.new(0, 10, 0, 10)
+openBtn.Text = "OPEN GUI"
+openBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+openBtn.TextColor3 = Color3.new(1, 1, 1)
+openBtn.Visible = false
+
+closeBtn.MouseButton1Click:Connect(function()
+	frame.Visible = false
+	openBtn.Visible = true
+end)
+
+openBtn.MouseButton1Click:Connect(function()
+	frame.Visible = true
+	openBtn.Visible = false
+end)
+
+
+local scroll = Instance.new("ScrollingFrame", frame)
+scroll.Size = UDim2.new(1, -10, 1, -50)
+scroll.Position = UDim2.new(0, 5, 0, 45)
+scroll.BackgroundTransparency = 1
+scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+scroll.ScrollBarThickness = 6
+scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+local uiGrid = Instance.new("UIGridLayout", scroll)
+uiGrid.CellSize = UDim2.new(0, 150, 0, 30)
+uiGrid.CellPadding = UDim2.new(0, 5, 0, 5)
+uiGrid.SortOrder = Enum.SortOrder.LayoutOrder
+
+
+local function createButton(text, callback)
+	local btn = Instance.new("TextButton", scroll)
+	btn.Size = UDim2.new(0, 150, 0, 30)
+	btn.Text = text
+	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.SourceSans
+	btn.TextScaled = true
+	btn.MouseButton1Click:Connect(callback)
+end
+
+
+createButton("Speed 100", function()
+	player.Character.Humanoid.WalkSpeed = 100
+end)
+
+createButton("High Jump", function()
+	player.Character.Humanoid.JumpPower = 150
+end)
+
+createButton("Dance", function()
+	local anim = Instance.new("Animation")
+	anim.AnimationId = "rbxassetid://33796059"
+	local track = player.Character.Humanoid:LoadAnimation(anim)
+	track:Play()
+end)
+
+createButton("Aimbot", function()
+	local cam = workspace.CurrentCamera
+	local function getClosest()
+		local closest, dist = nil, math.huge
+		for _, plr in pairs(game.Players:GetPlayers()) do
+			if plr ~= player and plr.Character and plr.Character:FindFirstChild("Head") then
+				local d = (cam.CFrame.Position - plr.Character.Head.Position).Magnitude
+				if d < dist then
+					closest = plr
+					dist = d
+				end
+			end
+		end
+		return closest
+	end
+	game:GetService("RunService").RenderStepped:Connect(function()
+		local target = getClosest()
+		if target then
+			cam.CFrame = CFrame.new(cam.CFrame.Position, target.Character.Head.Position)
+		end
+	end)
+end)
+
+createButton("Invisibility", function()
+	for _, part in pairs(char:GetDescendants()) do
+		if part:IsA("BasePart") then part.Transparency = 1 end
+	end
+end)
+
+createButton("Super Punch", function()
+	local tool = Instance.new("Tool")
+	tool.RequiresHandle = false
+	tool.Name = "SuperPunch"
+	tool.Activated:Connect(function()
+		for _, p in pairs(game.Players:GetPlayers()) do
+			if p ~= player and p.Character and (p.Character.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude < 10 then
+				p.Character:BreakJoints()
+			end
+		end
+	end)
+	tool.Parent = player.Backpack
+end)
+
+createButton("Heal to Max", function()
+	player.Character.Humanoid.Health = player.Character.Humanoid.MaxHealth
+end)
+
+createButton("Fly Mode", function()
+	local bv = Instance.new("BodyVelocity", char.HumanoidRootPart)
+	bv.Velocity = Vector3.new(0, 50, 0)
+	bv.MaxForce = Vector3.new(100000, 100000, 100000)
+	wait(3)
+	bv:Destroy()
+end)
+
+createButton("Noclip", function()
+	game:GetService("RunService").Stepped:Connect(function()
+		for _, p in pairs(char:GetDescendants()) do
+			if p:IsA("BasePart") then
+				p.CanCollide = false
+			end
+		end
+	end)
+end)
+
+createButton("Infinite Jump", function()
+	game:GetService("UserInputService").JumpRequest:Connect(function()
+		player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+	end)
+end)
+
+createButton("Rainbow Char", function()
+	while true do
+		wait(0.2)
+		for _, part in pairs(char:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.Color = Color3.fromHSV(tick()%5/5,1,1)
+			end
+		end
+	end
+end)
+
+createButton("Kill Aura", function()
+	game:GetService("RunService").Stepped:Connect(function()
+		for _, p in pairs(game.Players:GetPlayers()) do
+			if p ~= player and p.Character and (p.Character.PrimaryPart.Position - char.PrimaryPart.Position).Magnitude < 10 then
+				p.Character:BreakJoints()
+			end
+		end
+	end)
+end)
+
+createButton("Glitch FX", function()
+	for _, p in pairs(char:GetDescendants()) do
+		if p:IsA("BasePart") then
+			p.Material = Enum.Material.ForceField
+			p.Reflectance = 1
+		end
+	end
+end)
+
+-- SKYBOX
+createButton("Skybox", function()
+	local lighting = game:GetService("Lighting")
+	for _, child in pairs(lighting:GetChildren()) do
+		if child:IsA("Sky") then
+			child:Destroy()
+		end
+	end
+	local sky = Instance.new("Sky", lighting)
+	local id = "rbxassetid://120311128149890"
+	sky.SkyboxBk = id
+	sky.SkyboxDn = id
+	sky.SkyboxFt = id
+	sky.SkyboxLf = id
+	sky.SkyboxRt = id
+	sky.SkyboxUp = id
+end)
+
+-- DECAL SPAM
+createButton("Decal Spam", function()
+	local decalId = "rbxassetid://120311128149890"
+	for _, part in pairs(workspace:GetDescendants()) do
+		if part:IsA("BasePart") and not part:IsA("Terrain") then
+			local decal = Instance.new("Decal")
+			decal.Texture = decalId
+			decal.Face = Enum.NormalId.Front
+			decal.Parent = part
+		end
+	end
+end)
+
+-- HINT
+createButton("Hint", function()
+	local hint = Instance.new("Hint", game.CoreGui)
+	hint.Text = "ytyareoslav is here"
+	wait(5)
+	hint:Destroy()
+end)
